@@ -1,7 +1,7 @@
 package com.example.kafka_order_service.service;
 
 import org.springframework.stereotype.Component;
-
+import com.example.kafka_order_service.service.PriceAggregator;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
