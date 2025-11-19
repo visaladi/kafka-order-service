@@ -15,7 +15,7 @@ public class OrderConsumer {
 
     private final PriceAggregator priceAggregator;
     private final KafkaTemplate<String, Order> kafkaTemplate;
-
+    private final OrderStore orderStore;
     private static final String DLQ_TOPIC = "orders-dlq";
 
     @KafkaListener(topics = "orders", groupId = "order-consumer-group")
@@ -26,7 +26,14 @@ public class OrderConsumer {
         int maxRetries = 3;
         int attempts = 0;
         boolean success = false;
+        // Store the order
 
+        orderStore.addOrder(order);
+
+        // Update running average
+        priceAggregator.addPrice(order.getPrice());
+
+        System.out.println("Consumed Order → " + order.getOrderId());
         while (attempts < maxRetries && !success) {
             try {
                 attempts++;

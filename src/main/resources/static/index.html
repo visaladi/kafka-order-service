@@ -26,7 +26,7 @@
 
         .card {
           width: 100%;
-          max-width: 480px;
+          max-width: 520px;
           background: rgba(15, 23, 42, 0.95);
           border-radius: 18px;
           padding: 24px 22px 20px;
@@ -209,6 +209,42 @@
           text-align: right;
         }
 
+        .orders-title {
+          margin-top: 18px;
+          font-size: 0.9rem;
+          color: #9ca3af;
+        }
+
+        table {
+          width: 100%;
+          margin-top: 8px;
+          border-collapse: collapse;
+          font-size: 0.78rem;
+        }
+
+        th, td {
+          padding: 4px 6px;
+        }
+
+        th {
+          text-align: left;
+          border-bottom: 1px solid #334155;
+          color: #cbd5f5;
+          font-weight: 500;
+        }
+
+        tr:nth-child(even) td {
+          background: rgba(15, 23, 42, 0.65);
+        }
+
+        tr:nth-child(odd) td {
+          background: rgba(15, 23, 42, 0.4);
+        }
+
+        td {
+          border-bottom: 1px solid #111827;
+        }
+
         @media (max-width: 520px) {
           .card {
             margin: 18px;
@@ -274,6 +310,20 @@
         </div>
     </div>
 
+    <div class="orders-title">All Orders (consumed)</div>
+    <table id="ordersTable">
+        <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Product</th>
+            <th>Price (LKR)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Filled by JS -->
+        </tbody>
+    </table>
+
     <div class="tagline">
         Backend: <code>Spring Boot · Kafka · Avro</code>
     </div>
@@ -285,10 +335,41 @@
     const avgBtn = document.getElementById("avgBtn");
     const avgChip = document.getElementById("avgChip");
     const avgValue = document.getElementById("avgValue");
+    const ordersTableBody = document.querySelector("#ordersTable tbody");
 
     function setStatus(message, isError = false) {
       statusText.textContent = message;
       statusText.style.color = isError ? "#fecaca" : "#e5e7eb";
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch("/api/orders/all");
+        if (!res.ok) {
+          throw new Error("Failed to load orders");
+        }
+        const orders = await res.json();
+
+        ordersTableBody.innerHTML = "";
+        if (!orders.length) {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td colspan="3" style="padding:6px 6px; color:#9ca3af;">No orders consumed yet.</td>`;
+          ordersTableBody.appendChild(row);
+          return;
+        }
+
+        orders.forEach(order => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${order.orderId}</td>
+            <td>${order.product}</td>
+            <td>${order.price}</td>
+          `;
+          ordersTableBody.appendChild(row);
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
 
     form.addEventListener("submit", async (e) => {
@@ -319,6 +400,9 @@
 
         const text = await res.text();
         setStatus(text || `Order ${orderId} sent successfully ✅`);
+
+        // Refresh orders table after sending
+        await loadOrders();
       } catch (err) {
         console.error(err);
         setStatus("Error sending order: " + err.message, true);
@@ -347,6 +431,9 @@
         setStatus("Error fetching average: " + err.message, true);
       }
     });
+
+    // Load orders when page opens
+    loadOrders();
 </script>
 </body>
 </html>
