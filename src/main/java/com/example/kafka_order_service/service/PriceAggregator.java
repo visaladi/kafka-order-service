@@ -1,14 +1,14 @@
 package com.example.kafka_order_service.service;
 
 import org.springframework.stereotype.Component;
-import com.example.kafka_order_service.service.PriceAggregator;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class PriceAggregator {
 
     private final AtomicLong count = new AtomicLong(0);
-    private final AtomicLong sumTimes100 = new AtomicLong(0); // keep some precision
+    private final AtomicLong sumTimes100 = new AtomicLong(0);
 
     public synchronized void addPrice(float price) {
         count.incrementAndGet();

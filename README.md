@@ -35,6 +35,10 @@ This project is typically used as a hands-on lab to learn:
 
 
 
+## Kafka Order Dashboard UI
+<p align="center">
+  <img src="images/dashboard.png" width="850" style="border-radius:10px; border:1px solid #444;" />
+</p>
 ## 🧱 Architecture Overview
 
 
@@ -113,6 +117,11 @@ Clone & Build
 
 git clone https://github.com/<your-username>/kafka-order-service.git
 cd kafka-order-service
+
+## Kafdrop Topic Messages
+<p align="center">
+  <img src="images/kafdrop.png" width="850" style="border-radius:10px; border:1px solid #444;" />
+</p>
 
 # Build the project
 mvn clean package

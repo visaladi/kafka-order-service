@@ -1,7 +1,7 @@
 package com.example.kafka_order_service.controller;
 
-import com.example.kafka.avro.Order; // Avro class (from order.avsc)
 import com.example.kafka_order_service.dto.OrderRequest;
+import com.example.kafka_order_service.dto.OrderView;
 import com.example.kafka_order_service.service.OrderProducer;
 import com.example.kafka_order_service.service.OrderStore;
 import com.example.kafka_order_service.service.PriceAggregator;
@@ -22,7 +22,11 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<String> createOrder(@RequestBody OrderRequest request) {
-        orderProducer.sendOrder(request.getOrderId(), request.getProduct(), request.getPrice());
+        orderProducer.sendOrder(
+                request.getOrderId(),
+                request.getProduct(),
+                request.getPrice()
+        );
         return ResponseEntity.ok("Order sent to Kafka: " + request.getOrderId());
     }
 
@@ -32,7 +36,9 @@ public class OrderController {
     }
 
     @GetMapping("/all")
-    public List<Order> getAllOrders() {
-        return orderStore.getAllOrders();
+    public List<OrderView> getAllOrders() {
+        // This now matches the getAll() we added in OrderStore
+        return orderStore.getAll();
     }
 }
+
