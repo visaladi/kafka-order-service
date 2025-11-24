@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <title>Kafka Order Service</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -42,16 +46,10 @@
           margin-bottom: 16px;
         }
 
-        .title {
-          font-size: 1.2rem;
-          font-weight: 600;
-          letter-spacing: 0.03em;
-        }
-
+        .title { font-size: 1.2rem; font-weight: 600; }
         .badge {
           font-size: 0.7rem;
           text-transform: uppercase;
-          letter-spacing: 0.14em;
           padding: 4px 8px;
           border-radius: 999px;
           border: 1px solid #22c55e33;
@@ -65,24 +63,10 @@
           margin-bottom: 16px;
         }
 
-        form {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 10px;
-          margin-bottom: 14px;
-        }
+        form { display: grid; gap: 10px; margin-bottom: 14px; }
+        label { font-size: 0.8rem; margin-bottom: 4px; color: #d1d5db; display: block; }
 
-        label {
-          font-size: 0.8rem;
-          color: #d1d5db;
-          margin-bottom: 4px;
-          display: block;
-        }
-
-        .field {
-          display: flex;
-          flex-direction: column;
-        }
+        .field { display: flex; flex-direction: column; }
 
         input {
           border-radius: 10px;
@@ -91,122 +75,41 @@
           background: rgba(15, 23, 42, 0.9);
           color: #e5e7eb;
           font-size: 0.9rem;
-          outline: none;
-          transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
         }
+        input:focus { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e55; }
 
-        input::placeholder {
-          color: #6b7280;
-        }
+        .row { display: flex; gap: 10px; }
 
-        input:focus {
-          border-color: #22c55e;
-          box-shadow: 0 0 0 1px #22c55e55;
-          background: rgba(15, 23, 42, 1);
-        }
-
-        .row {
-          display: flex;
-          gap: 10px;
-        }
-
-        .row > .field {
-          flex: 1;
-        }
-
-        .actions {
-          display: flex;
-          gap: 8px;
-          margin-top: 6px;
-        }
+        .actions { display: flex; gap: 8px; }
 
         button {
           flex: 1;
           border-radius: 999px;
-          border: none;
           padding: 8px 14px;
           font-size: 0.86rem;
           font-weight: 500;
           cursor: pointer;
-          transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          white-space: nowrap;
         }
 
         .btn-primary {
           background: linear-gradient(135deg, #22c55e, #16a34a);
           color: #022c22;
-          box-shadow: 0 10px 20px rgba(22, 163, 74, 0.5);
-        }
-
-        .btn-primary:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 12px 24px rgba(22, 163, 74, 0.6);
         }
 
         .btn-secondary {
           background: #020617;
-          color: #e5e7eb;
           border: 1px solid #4b5563;
-        }
-
-        .btn-secondary:hover {
-          background: #020617;
-          border-color: #9ca3af;
-          transform: translateY(-1px);
+          color: #e5e7eb;
         }
 
         .status {
           margin-top: 12px;
-          padding: 10px 10px 8px;
+          padding: 10px;
           border-radius: 12px;
           font-size: 0.78rem;
           background: rgba(15, 23, 42, 0.9);
           border: 1px solid rgba(75, 85, 99, 0.9);
-          color: #e5e7eb;
           min-height: 40px;
-          white-space: pre-line;
-        }
-
-        .status-title {
-          font-weight: 600;
-          font-size: 0.78rem;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-          color: #9ca3af;
-          margin-bottom: 2px;
-        }
-
-        .status-text {
-          font-size: 0.8rem;
-        }
-
-        .avg-chip {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          border-radius: 999px;
-          border: 1px solid #22c55e55;
-          padding: 4px 9px;
-          font-size: 0.76rem;
-          color: #bbf7d0;
-          background: #16a34a11;
-          margin-left: 4px;
-        }
-
-        .avg-value {
-          font-weight: 600;
-          color: #4ade80;
-        }
-
-        .tagline {
-          margin-top: 10px;
-          font-size: 0.7rem;
-          color: #6b7280;
-          text-align: right;
         }
 
         .orders-title {
@@ -222,218 +125,209 @@
           font-size: 0.78rem;
         }
 
-        th, td {
-          padding: 4px 6px;
-        }
-
         th {
-          text-align: left;
           border-bottom: 1px solid #334155;
           color: #cbd5f5;
           font-weight: 500;
-        }
-
-        tr:nth-child(even) td {
-          background: rgba(15, 23, 42, 0.65);
-        }
-
-        tr:nth-child(odd) td {
-          background: rgba(15, 23, 42, 0.4);
+          text-align: left;
+          padding: 4px;
         }
 
         td {
+          padding: 4px;
           border-bottom: 1px solid #111827;
         }
 
-        @media (max-width: 520px) {
-          .card {
-            margin: 18px;
-          }
+        tr:nth-child(even) td { background: rgba(15, 23, 42, 0.65); }
+        tr:nth-child(odd) td { background: rgba(15, 23, 42, 0.4); }
+
+        /* Fixed-size chart container */
+        .chart-container {
+          margin-top: 16px;
+          padding: 10px;
+          border-radius: 14px;
+          border: 1px solid rgba(148, 163, 184, 0.3);
+          background: rgba(15, 23, 42, 0.9);
         }
     </style>
 </head>
+
 <body>
 <div class="card">
+
     <div class="header">
         <div class="title">Kafka Order Dashboard</div>
         <div class="badge">Avro · Kafka</div>
     </div>
 
     <div class="subtitle">
-        Send test orders to the <code>/api/orders</code> endpoint and monitor the running
-        average consumed from the <code>orders</code> topic.
+        Send test orders to <code>/api/orders</code> and track consumed order prices with a running average graph.
     </div>
 
+    <!-- Form -->
     <form id="orderForm">
         <div class="field">
-            <label for="orderId">Order ID</label>
-            <input id="orderId" name="orderId" type="text" placeholder="e.g. ORD-1001" required />
+            <label>Order ID</label>
+            <input id="orderId" type="text" required />
         </div>
 
         <div class="field">
-            <label for="product">Product</label>
-            <input id="product" name="product" type="text" placeholder="e.g. Keyboard" required />
+            <label>Product</label>
+            <input id="product" type="text" required />
         </div>
 
-        <div class="row">
-            <div class="field">
-                <label for="price">Price (LKR)</label>
-                <input
-                        id="price"
-                        name="price"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="e.g. 7500.00"
-                        required
-                />
-            </div>
+        <div class="field">
+            <label>Price (LKR)</label>
+            <input id="price" type="number" step="0.01" required />
         </div>
 
         <div class="actions">
-            <button type="submit" class="btn-primary">
-                🚀 Send Order
-            </button>
-            <button type="button" id="avgBtn" class="btn-secondary">
-                📊 Get Average
-            </button>
+            <button type="submit" class="btn-primary">🚀 Send Order</button>
+            <button type="button" id="avgBtn" class="btn-secondary">📊 Get Average</button>
         </div>
     </form>
 
     <div class="status">
-        <div class="status-title">Status</div>
-        <div class="status-text" id="statusText">
-            Waiting for action…
-        </div>
-        <div id="avgChip" class="avg-chip" style="display:none;">
-            Current Avg: <span class="avg-value" id="avgValue">0.00</span>
-        </div>
+        <div>Status:</div>
+        <div id="statusText">Waiting…</div>
     </div>
 
-    <div class="orders-title">All Orders (consumed)</div>
+    <div class="orders-title">All Orders (Consumed)</div>
+
+    <!-- Orders Table -->
     <table id="ordersTable">
         <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Product</th>
-            <th>Price (LKR)</th>
-        </tr>
+        <tr><th>Order ID</th><th>Product</th><th>Price</th></tr>
         </thead>
-        <tbody>
-        <!-- Filled by JS -->
-        </tbody>
+        <tbody></tbody>
     </table>
 
-    <div class="tagline">
-        Backend: <code>Spring Boot · Kafka · Avro</code>
+    <!-- FIXED SIZE CHART -->
+    <div class="chart-container">
+        <canvas id="ordersChart"
+                width="480"
+                height="200"
+                style="max-width:480px; max-height:200px;">
+        </canvas>
     </div>
+
+    <div class="tagline">Backend: Spring Boot · Kafka · Avro</div>
 </div>
 
 <script>
-    const form = document.getElementById("orderForm");
     const statusText = document.getElementById("statusText");
-    const avgBtn = document.getElementById("avgBtn");
-    const avgChip = document.getElementById("avgChip");
-    const avgValue = document.getElementById("avgValue");
     const ordersTableBody = document.querySelector("#ordersTable tbody");
+    let chart = null;
 
-    function setStatus(message, isError = false) {
-      statusText.textContent = message;
-      statusText.style.color = isError ? "#fecaca" : "#e5e7eb";
+    function setStatus(msg, error = false) {
+        statusText.textContent = msg;
+        statusText.style.color = error ? "#ffb3b3" : "#e5e7eb";
+    }
+
+    // 📌 Draw fixed-size chart
+    function drawChart(orders) {
+        const ctx = document.getElementById("ordersChart").getContext("2d");
+
+        if (chart) chart.destroy();
+
+        if (!orders.length) return;
+
+        const prices = orders.map(o => o.price);
+        const labels = orders.map((_, i) => `#${i + 1}`);
+
+        let running = [];
+        let sum = 0;
+        prices.forEach((p, i) => {
+            sum += p;
+            running.push(sum / (i + 1));
+        });
+
+        chart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Price",
+                        data: prices,
+                        borderWidth: 2,
+                        tension: 0.3
+                    },
+                    {
+                        label: "Running Avg",
+                        data: running,
+                        borderWidth: 2,
+                        tension: 0.3,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: false,     // FIXED SIZE
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: "#9ca3af" } },
+                    y: { ticks: { color: "#9ca3af" } }
+                }
+            }
+        });
     }
 
     async function loadOrders() {
-      try {
         const res = await fetch("/api/orders/all");
-        if (!res.ok) {
-          throw new Error("Failed to load orders");
-        }
         const orders = await res.json();
 
         ordersTableBody.innerHTML = "";
+
         if (!orders.length) {
-          const row = document.createElement("tr");
-          row.innerHTML = `<td colspan="3" style="padding:6px 6px; color:#9ca3af;">No orders consumed yet.</td>`;
-          ordersTableBody.appendChild(row);
-          return;
+            ordersTableBody.innerHTML =
+                `<tr><td colspan="3" style="color:#9ca3af;">No orders yet.</td></tr>`;
+            drawChart([]);
+            return;
         }
 
-        orders.forEach(order => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${order.orderId}</td>
-            <td>${order.product}</td>
-            <td>${order.price}</td>
-          `;
-          ordersTableBody.appendChild(row);
+        orders.forEach(o => {
+            ordersTableBody.innerHTML += `
+                <tr>
+                  <td>${o.orderId}</td>
+                  <td>${o.product}</td>
+                  <td>${o.price}</td>
+                </tr>`;
         });
-      } catch (err) {
-        console.error(err);
-      }
+
+        drawChart(orders);
     }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    document.getElementById("orderForm").addEventListener("submit", async e => {
+        e.preventDefault();
 
-      const orderId = document.getElementById("orderId").value.trim();
-      const product = document.getElementById("product").value.trim();
-      const price = parseFloat(document.getElementById("price").value);
+        const body = {
+            orderId: orderId.value,
+            product: product.value,
+            price: parseFloat(price.value)
+        };
 
-      if (!orderId || !product || isNaN(price)) {
-        setStatus("Please fill all fields with valid values.", true);
-        return;
-      }
+        setStatus("Sending order…");
 
-      setStatus("Sending order to backend…");
-
-      try {
         const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, product, price })
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
         });
 
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || "Request failed");
-        }
-
-        const text = await res.text();
-        setStatus(text || `Order ${orderId} sent successfully ✅`);
-
-        // Refresh orders table after sending
+        setStatus(await res.text());
         await loadOrders();
-      } catch (err) {
-        console.error(err);
-        setStatus("Error sending order: " + err.message, true);
-      }
     });
 
-    avgBtn.addEventListener("click", async () => {
-      setStatus("Fetching running average from backend…");
+    document.getElementById("avgBtn")
+        .addEventListener("click", async () => {
+            const res = await fetch("/api/orders/average");
+            const avg = await res.text();
+            setStatus("Average: " + avg);
+        });
 
-      try {
-        const res = await fetch("/api/orders/average");
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || "Request failed");
-        }
-
-        const avg = await res.text();
-        const parsed = parseFloat(avg);
-        const fixed = isNaN(parsed) ? avg : parsed.toFixed(2);
-
-        avgChip.style.display = "inline-flex";
-        avgValue.textContent = fixed;
-        setStatus("Running average fetched successfully ✅");
-      } catch (err) {
-        console.error(err);
-        setStatus("Error fetching average: " + err.message, true);
-      }
-    });
-
-    // Load orders when page opens
     loadOrders();
 </script>
+
 </body>
 </html>

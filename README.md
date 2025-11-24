@@ -39,10 +39,15 @@ This project is typically used as a hands-on lab to learn:
 <p align="center">
   <img src="images/dashboard.png" width="850" style="border-radius:10px; border:1px solid #444;" />
 </p>
-## 🧱 Architecture Overview
+
+## Architecture Overview
+
+<p align="center">
+  <img src="images/archi.png" width="850" style="border-radius:10px; border:1px solid #444;" />
+</p>
 
 
-###Flow summary:
+Flow summary:
 
 Client sends an HTTP request (e.g. POST /api/orders).
 
